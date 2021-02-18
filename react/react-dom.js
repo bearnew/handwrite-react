@@ -21,7 +21,7 @@ function createNode(vnode) {
     if (typeof type === 'string') {
         // 原生标签节点
         node = updateHostComponent(vnode);
-    } else %if (isStringOrNumber(sth)) {
+    } else if (isStringOrNumber(sth)) {
         // 文本标签节点
     }
 
