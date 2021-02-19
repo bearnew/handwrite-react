@@ -23,16 +23,56 @@ function createNode(vnode) {
         node = updateHostComponent(vnode);
     } else if (isStringOrNumber(sth)) {
         // 文本标签节点
+        node = updateTextComponent(vnode);
+    } else if (typeof type === 'function') {
+        // 函数组件
+        node = type.prototype.isReactComponent ? updateClassComponent(vnode) : updateFunctionComponent(vnode);
     }
 
     return node;
+}
+
+// 给node添加属性
+function updateNode(node, nextVal) {
+    Object.keys(nextVal).filter(k => k !== "children")
+    .forEach(k => {
+        node[k] = nextVal[k];
+    })
 }
 
 // 生成原生标签节点
 function updateHostComponent(vnode) {
     const { type, props } = vnode;
     const node = document.createElement(type);
+    updateNode(node, props);
     reconcileChildren(node, props.children);
+    return node;
+}
+
+// 生成文本节点
+function updateTextComponent(vnode) {
+    const node = document.createTextNode(vnode);
+    return node;
+}
+
+// 返回node节点
+function updateFunctionComponent(vnode) {
+    const { type, props } = vnode;
+    const child = type(props);
+    // vnode -> node
+    const node = createNode(child);
+
+    return node;
+}
+
+// 类组件，返回node节点
+function updateClassComponent(vnode) {
+    const { type, props } = vnode;
+    const instance = new type(props);
+    const child = instance.render();
+    // vnode -> node
+    const node = createNode(child);
+
     return node;
 }
 
