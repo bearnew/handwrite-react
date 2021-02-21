@@ -27,6 +27,8 @@ function createNode(vnode) {
     } else if (typeof type === 'function') {
         // 函数组件
         node = type.prototype.isReactComponent ? updateClassComponent(vnode) : updateFunctionComponent(vnode);
+    } else {
+        node = updateFragmentComponent(vnode);
     }
 
     return node;
@@ -73,6 +75,13 @@ function updateClassComponent(vnode) {
     // vnode -> node
     const node = createNode(child);
 
+    return node;
+}
+
+// 
+function updateFragmentComponent(vnode) {
+    const node = document.createDocumentFragment();
+    reconcileChildren(node, vnode.props.children);
     return node;
 }
 
